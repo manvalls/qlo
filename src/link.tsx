@@ -14,8 +14,13 @@ export const Link = component$(({ href, ...props }: LinkProps) => {
       return undefined;
     }
 
+    const {
+      params: { locale },
+      url: { pathname },
+    } = location;
+
     if (
-      !location.params.locale ||
+      !locale ||
       href.startsWith("//") ||
       href.startsWith("#") ||
       !href.startsWith("/")
@@ -28,9 +33,9 @@ export const Link = component$(({ href, ...props }: LinkProps) => {
       .map((url) => (url.endsWith("/") ? url : `${url}/`))
       .find(
         (baseURL) =>
-          location.url.pathname.startsWith(baseURL) ||
-          location.url.pathname === baseURL ||
-          location.url.pathname === baseURL.replace(/\/$/, "")
+          pathname.startsWith(baseURL) ||
+          pathname === baseURL ||
+          pathname === baseURL.replace(/\/$/, "")
       );
 
     if (!foundBaseURL) {
