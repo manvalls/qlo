@@ -25,7 +25,11 @@ export const useTranslation = <T extends object>(
 
     if (typeof modifier === "object") {
       const modifierFn =
-        modifier[locale] ?? modifier[config.defaultLocale ?? config.locales[0]];
+        modifier[locale] ??
+        modifier[locale.replace("-", "_")] ??
+        modifier[locale.split(/-|_/)[0]] ??
+        modifier["_"] ??
+        modifier[config.defaultLocale ?? config.locales[0]];
       await modifierFn?.(store, locale);
     } else {
       await modifier(store, locale);
