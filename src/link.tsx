@@ -14,6 +14,15 @@ export const Link = component$(({ href, ...props }: LinkProps) => {
       return undefined;
     }
 
+    if (
+      !location.params.locale ||
+      href.startsWith("//") ||
+      href.startsWith("#") ||
+      !href.startsWith("/")
+    ) {
+      return href;
+    }
+
     const baseURLs = config.baseURLs ?? ["/"];
     const foundBaseURL = baseURLs
       .map((url) => (url.endsWith("/") ? url : `${url}/`))
@@ -24,16 +33,14 @@ export const Link = component$(({ href, ...props }: LinkProps) => {
           location.url.pathname === baseURL.replace(/\/$/, "")
       );
 
-    if (
-      !foundBaseURL ||
-      href.startsWith("//") ||
-      href.startsWith("#") ||
-      !href.startsWith("/")
-    ) {
+    if (!foundBaseURL) {
       return href;
     }
 
-    return `${foundBaseURL}${href.replace(/^\//, "")}`;
+    return `${foundBaseURL}${location.params.locale}/${href.replace(
+      /^\//,
+      ""
+    )}`;
   });
 
   return <QwikLink href={computedHref.value} {...props} />;
