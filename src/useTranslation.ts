@@ -12,7 +12,7 @@ export type ModifierMap<T extends object> = {
 
 export type Modifier<T extends object> = ModifierQRL<T> | ModifierMap<T>;
 
-export const useQLO = <T extends object>(
+export const useTranslation = <T extends object>(
   initialState: T,
   modifier: Modifier<T>
 ) => {

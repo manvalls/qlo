@@ -2,7 +2,7 @@ import { component$ } from "@builder.io/qwik";
 import { useLocation } from "@builder.io/qwik-city";
 import { useQLOConfig } from "./context";
 
-export const QLOAlternateLinks = component$(() => {
+export const AlternateLinks = component$(() => {
   const location = useLocation();
   const config = useQLOConfig();
   const baseURLs = config.baseURLs ?? ["/"];
