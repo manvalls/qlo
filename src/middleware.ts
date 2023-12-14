@@ -12,7 +12,9 @@ export const qloMiddleware = (config: QLOConfig) => {
     error,
     locale,
     cookie,
+    sharedMap,
   }: RequestEvent<any>) => {
+    sharedMap.set("dev.valls.qlo", config);
     const cookieName = config.localeCookie ?? "QLO_LOCALE";
     const getCookieLocale = () => {
       const cookieValue = cookie.get(cookieName);
