@@ -37,10 +37,7 @@ export const Link = component$(({ href, ...props }: LinkProps) => {
       return href;
     }
 
-    return `${foundBaseURL}${location.params.locale}/${href.replace(
-      /^\//,
-      ""
-    )}`;
+    return `${foundBaseURL}${location.params.locale}${href}`;
   });
 
   return <QwikLink href={computedHref.value} {...props} />;
