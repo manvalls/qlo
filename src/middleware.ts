@@ -8,7 +8,6 @@ export const qloMiddleware = (config: QLOConfig) => {
   return async ({
     params,
     url,
-    next,
     redirect,
     error,
     locale,
@@ -29,7 +28,7 @@ export const qloMiddleware = (config: QLOConfig) => {
       );
 
       if (!foundBaseURL) {
-        return next();
+        return;
       }
 
       const cookieLocale = getCookieLocale();
@@ -40,7 +39,7 @@ export const qloMiddleware = (config: QLOConfig) => {
         throw redirect(307, redirectURL);
       }
 
-      return next();
+      return;
     }
 
     if (!config.locales.includes(params.locale)) {
@@ -55,6 +54,6 @@ export const qloMiddleware = (config: QLOConfig) => {
     }
 
     locale(params.locale);
-    return next();
+    return;
   };
 };
