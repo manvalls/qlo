@@ -4,3 +4,4 @@ export * from "./loadTranslation";
 export * from "./alternateLinks";
 export * from "./middleware";
 export * from "./config";
+export * from "./link";
