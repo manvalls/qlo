@@ -10,8 +10,13 @@ export const Link = component$(({ href, ...props }: LinkProps) => {
   const config = useQLOConfig();
   const location = useLocation();
   const computedHref = useComputed$(() => {
-    if (!href) {
-      return undefined;
+    if (
+      !href ||
+      href.startsWith("//") ||
+      href.startsWith("#") ||
+      !href.startsWith("/")
+    ) {
+      return href;
     }
 
     const {
@@ -19,12 +24,7 @@ export const Link = component$(({ href, ...props }: LinkProps) => {
       url: { pathname },
     } = location;
 
-    if (
-      !locale ||
-      href.startsWith("//") ||
-      href.startsWith("#") ||
-      !href.startsWith("/")
-    ) {
+    if (!locale) {
       return href;
     }
 
