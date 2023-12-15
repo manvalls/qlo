@@ -1,8 +1,9 @@
 import { RequestEvent } from "@builder.io/qwik-city";
-import acceptLanguage from "accept-language";
+import { default as AL } from "accept-language";
 import { QLOConfig } from "./config";
 
 export const qloMiddleware = (config: QLOConfig) => {
+  const acceptLanguage = AL.create();
   acceptLanguage.languages(config.locales);
 
   return async ({
