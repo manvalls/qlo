@@ -1,10 +1,38 @@
 import { RequestEvent } from "@builder.io/qwik-city";
-import { default as AL } from "accept-language";
 import { QLOConfig } from "./config";
 
 export const qloMiddleware = (config: QLOConfig) => {
-  const acceptLanguage = AL.create();
-  acceptLanguage.languages(config.locales);
+  const cookieName = config.localeCookie ?? "QLO_LOCALE";
+
+  function findLocale(locale?: string) {
+    if (!locale) {
+      return;
+    }
+
+    return config.locales.find(
+      (l) =>
+        l === locale ||
+        l === locale.replace("-", "_") ||
+        l === locale.split(/-|_/)[0]
+    );
+  }
+
+  function getAcceptLanguageLocale(acceptLanguageHeader?: string | null) {
+    if (!acceptLanguageHeader) {
+      return;
+    }
+
+    const acceptLanguage = acceptLanguageHeader
+      .split(",")
+      .map((l) => l.split(";")[0].trim());
+
+    for (const locale of acceptLanguage) {
+      const foundLocale = findLocale(locale);
+      if (foundLocale) {
+        return foundLocale;
+      }
+    }
+  }
 
   return async ({
     params,
@@ -17,12 +45,6 @@ export const qloMiddleware = (config: QLOConfig) => {
     request: { headers },
   }: RequestEvent<any>) => {
     sharedMap.set("dev.valls.qlo", config);
-    const cookieName = config.localeCookie ?? "QLO_LOCALE";
-    const getCookieLocale = () => {
-      if (cookie.has(cookieName)) {
-        return acceptLanguage.get(cookie.get(cookieName)?.value);
-      }
-    };
 
     if (!params.locale) {
       const baseURLs = config.baseURLs ?? ["/"];
@@ -35,8 +57,8 @@ export const qloMiddleware = (config: QLOConfig) => {
       }
 
       const locale =
-        getCookieLocale() ||
-        acceptLanguage.get(headers.get("accept-language")) ||
+        findLocale(cookie.get(cookieName)?.value) ||
+        getAcceptLanguageLocale(headers.get("accept-language")) ||
         config.defaultLocale ||
         config.locales[0];
 
@@ -55,7 +77,7 @@ export const qloMiddleware = (config: QLOConfig) => {
     }
 
     if (config.cookieOptions) {
-      const cookieLocale = getCookieLocale();
+      const cookieLocale = findLocale(cookie.get(cookieName)?.value);
       if (!cookieLocale || cookieLocale !== params.locale) {
         cookie.set(cookieName, params.locale, config.cookieOptions);
       }
