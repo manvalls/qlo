@@ -5,4 +5,5 @@ export * from "./alternateLinks";
 export * from "./middleware";
 export * from "./config";
 export * from "./link";
+export * from "./localeLink";
 export * from "./renderer";
