@@ -13,13 +13,13 @@ export const qloMiddleware = (config: QLOConfig) => {
     locale,
     cookie,
     sharedMap,
+    request: { headers },
   }: RequestEvent<any>) => {
     sharedMap.set("dev.valls.qlo", config);
     const cookieName = config.localeCookie ?? "QLO_LOCALE";
     const getCookieLocale = () => {
-      const cookieValue = cookie.get(cookieName);
-      if (cookieValue && config.locales.includes(cookieValue.value)) {
-        return cookieValue.value;
+      if (cookie.has(cookieName)) {
+        return acceptLanguage.get(cookie.get(cookieName)?.value);
       }
     };
 
@@ -33,11 +33,16 @@ export const qloMiddleware = (config: QLOConfig) => {
         return;
       }
 
-      const cookieLocale = getCookieLocale();
-      if (cookieLocale) {
+      const locale =
+        getCookieLocale() ||
+        acceptLanguage.get(headers.get("accept-language")) ||
+        config.defaultLocale ||
+        config.locales[0];
+
+      if (locale) {
         const redirectURL = foundBaseURL.endsWith("/")
-          ? `${foundBaseURL}${cookieLocale}${url.search}`
-          : `${foundBaseURL}/${cookieLocale}${url.search}`;
+          ? `${foundBaseURL}${locale}${url.search}`
+          : `${foundBaseURL}/${locale}${url.search}`;
         throw redirect(307, redirectURL);
       }
 
