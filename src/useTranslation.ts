@@ -1,9 +1,9 @@
-import { QRL, useStore, useTask$ } from "@builder.io/qwik";
+import { QRL, UseStoreOptions, useStore, useTask$ } from "@builder.io/qwik";
 import { useLocation } from "@builder.io/qwik-city";
 import { useQLOConfig } from "./context";
 
 export type ModifierQRL<T extends object> = QRL<
-  (t: T, locale: string) => Promise<void> | void
+  (t: T, locale: string) => Promise<T | void> | T | void
 >;
 
 export type ModifierMap<T extends object> = {
@@ -14,15 +14,17 @@ export type Modifier<T extends object> = ModifierQRL<T> | ModifierMap<T>;
 
 export const useTranslation = <T extends object>(
   initialState: T,
-  modifier: Modifier<T>
+  modifier: Modifier<T>,
+  opts?: UseStoreOptions
 ) => {
-  const store = useStore<T>(initialState);
+  const store = useStore<T>(initialState, opts);
   const location = useLocation();
   const config = useQLOConfig();
 
   useTask$(async ({ track }) => {
     const locale = track(() => location.params.locale) ?? "";
 
+    let result: T | void;
     if (typeof modifier === "object") {
       const modifierFn =
         modifier[locale] ??
@@ -30,9 +32,13 @@ export const useTranslation = <T extends object>(
         modifier[locale.split(/-|_/)[0]] ??
         modifier["_"] ??
         modifier[config.defaultLocale ?? config.locales[0]];
-      await modifierFn?.(store, locale);
+      result = await modifierFn?.(store, locale);
     } else {
-      await modifier(store, locale);
+      result = await modifier(store, locale);
+    }
+
+    if (result) {
+      Object.assign(store, result);
     }
   });
 
