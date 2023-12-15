@@ -1,4 +1,4 @@
-export { useQLOProvider } from "./context";
+export { QLOProvider } from "./context";
 export * from "./useTranslation";
 export * from "./loadTranslation";
 export * from "./alternateLinks";
