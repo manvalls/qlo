@@ -1,4 +1,4 @@
-import { RequestEvent } from "@builder.io/qwik-city";
+import { RequestEventLoader } from "@builder.io/qwik-city";
 import { QLOConfig } from "./config";
 
 export type LoaderFn<T extends object> = (locale: string) => Promise<T> | T;
@@ -10,7 +10,7 @@ export type LoaderMap<T extends object> = {
 export type Loader<T extends object> = LoaderFn<T> | LoaderMap<T>;
 
 export const loadTranslation = async <T extends object>(
-  { params, sharedMap }: RequestEvent<any>,
+  { params, sharedMap }: RequestEventLoader<any>,
   loader: Loader<T>
 ): Promise<T> => {
   const { locale } = params;
