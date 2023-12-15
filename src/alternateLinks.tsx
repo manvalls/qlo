@@ -7,9 +7,9 @@ export const AlternateLinks = component$(() => {
   const config = useQLOConfig();
   const baseURLs = config.baseURLs ?? ["/"];
   const regexp = new RegExp(
-    `${location.url.origin
+    `(${location.url.origin
       .replace(/\//g, "\\/")
-      .replace(/\./g, "\\.")}(${baseURLs
+      .replace(/\./g, "\\.")})(${baseURLs
       .map((baseURL) => baseURL.replace(/\//g, "\\/"))
       .join("|")})\\/?${location.params.locale}(?=/|\\?|$)`
   );
@@ -22,7 +22,7 @@ export const AlternateLinks = component$(() => {
             location.params.locale && locale !== location.params.locale
         )
         .map((locale) => {
-          const href = location.url.href.replace(regexp, `$1${locale}`);
+          const href = location.url.href.replace(regexp, `$1$2${locale}`);
           return (
             <link
               rel="alternate"
