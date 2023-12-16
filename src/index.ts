@@ -7,3 +7,4 @@ export * from "./config";
 export * from "./link";
 export * from "./localeLink";
 export * from "./renderer";
+export * from "./useLocale";
