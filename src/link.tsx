@@ -3,7 +3,7 @@ import {
   LinkProps,
   useLocation,
 } from "@builder.io/qwik-city";
-import { component$, useComputed$ } from "@builder.io/qwik";
+import { Slot, component$, useComputed$ } from "@builder.io/qwik";
 import { useQLOConfig } from "./context";
 
 export const Link = component$(({ href, ...props }: LinkProps) => {
@@ -45,5 +45,9 @@ export const Link = component$(({ href, ...props }: LinkProps) => {
     return `${foundBaseURL}${location.params.locale}${href}`;
   });
 
-  return <QwikLink href={computedHref.value} {...props} />;
+  return (
+    <QwikLink href={computedHref.value} {...props}>
+      <Slot />
+    </QwikLink>
+  );
 });
