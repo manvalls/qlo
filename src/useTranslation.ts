@@ -17,7 +17,11 @@ export const useTranslation = <T extends object>(
   modifier: Modifier<T>,
   opts?: UseStoreOptions
 ) => {
-  const store = useStore<T>(initialState, opts);
+  const store = useStore<T>(initialState, {
+    ...opts,
+    deep: opts?.deep ?? false,
+  });
+
   const location = useLocation();
   const config = useQLOConfig();
 
