@@ -27,7 +27,7 @@ export const onGet: RequestHandler = async (ev) => {
 };
 ```
 
-Set the `lang`` attribute from `opts.locale` in your entry file:
+Set the `lang` attribute from `opts.locale` in your entry file:
 
 ```javascript
 // entry.ssr.tsx
