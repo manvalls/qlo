@@ -5,6 +5,14 @@
   "main": "./lib/index.qwik.mjs",
   "qwik": "./lib/index.qwik.mjs",
   "types": "./lib-types/index.d.ts",
+  "keywords": [
+    "qwik",
+    "i18n"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/manvalls/qlo.git"
+  },
   "exports": {
     ".": {
       "import": "./lib/index.qwik.mjs",
