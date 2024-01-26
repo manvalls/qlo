@@ -43,7 +43,9 @@ export const qloMiddleware = (config: QLOConfig) => {
     cookie,
     sharedMap,
     request: { headers },
+    env,
   }: RequestEvent<any>) => {
+    const qloOrigin = env.get("QLO_ORIGIN") || "";
     sharedMap.set("dev.valls.qlo", config);
 
     if (!params.locale) {
@@ -66,7 +68,7 @@ export const qloMiddleware = (config: QLOConfig) => {
         const redirectURL = foundBaseURL.endsWith("/")
           ? `${foundBaseURL}${locale}${url.search}`
           : `${foundBaseURL}/${locale}${url.search}`;
-        throw redirect(307, redirectURL);
+        throw redirect(307, `${qloOrigin}${redirectURL}`);
       }
 
       return;
@@ -74,6 +76,11 @@ export const qloMiddleware = (config: QLOConfig) => {
 
     if (!config.locales.includes(params.locale)) {
       throw error(404, "Not found");
+    }
+
+    const qloHostname = new URL(qloOrigin).hostname;
+    if (url.hostname !== qloHostname) {
+      throw redirect(307, `${qloOrigin}${url.pathname}${url.search}`);
     }
 
     if (config.cookieOptions) {
