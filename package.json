@@ -1,6 +1,6 @@
 {
   "name": "qlo",
-  "version": "0.6.3",
+  "version": "0.7.0",
   "description": "Qwik locale utils",
   "main": "./lib/index.qwik.mjs",
   "qwik": "./lib/index.qwik.mjs",
