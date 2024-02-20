@@ -78,7 +78,7 @@ export const qloMiddleware = (config: QLOConfig) => {
       throw error(404, "Not found");
     }
 
-    const qloHostname = new URL(qloOrigin).hostname;
+    const qloHostname = qloOrigin ? new URL(qloOrigin).hostname : url.hostname;
     if (url.hostname !== qloHostname) {
       throw redirect(307, `${qloOrigin}${url.pathname}${url.search}`);
     }
