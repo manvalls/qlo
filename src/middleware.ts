@@ -48,49 +48,58 @@ export const qloMiddleware = (config: QLOConfig) => {
     const qloOrigin = env.get("QLO_ORIGIN") || "";
     sharedMap.set("dev.valls.qlo", config);
 
-    if (!params.locale) {
-      const baseURLs = config.baseURLs ?? ["/"];
-      const foundBaseURL = baseURLs.find(
-        (baseURL) => url.pathname === baseURL || baseURL === `${url.pathname}/`
-      );
+    function checkLocale() {
+      if (!params.locale) {
+        const baseURLs = config.baseURLs ?? ["/"];
+        const foundBaseURL = baseURLs.find(
+          (baseURL) =>
+            url.pathname === baseURL || baseURL === `${url.pathname}/`
+        );
 
-      if (!foundBaseURL) {
+        if (!foundBaseURL) {
+          return;
+        }
+
+        const locale =
+          findLocale(cookie.get(cookieName)?.value) ||
+          getAcceptLanguageLocale(headers.get("accept-language")) ||
+          config.defaultLocale ||
+          config.locales[0];
+
+        if (locale) {
+          const redirectURL = foundBaseURL.endsWith("/")
+            ? `${foundBaseURL}${locale}${url.search}`
+            : `${foundBaseURL}/${locale}${url.search}`;
+          throw redirect(307, `${qloOrigin}${redirectURL}`);
+        }
+
         return;
       }
 
-      const locale =
-        findLocale(cookie.get(cookieName)?.value) ||
-        getAcceptLanguageLocale(headers.get("accept-language")) ||
-        config.defaultLocale ||
-        config.locales[0];
-
-      if (locale) {
-        const redirectURL = foundBaseURL.endsWith("/")
-          ? `${foundBaseURL}${locale}${url.search}`
-          : `${foundBaseURL}/${locale}${url.search}`;
-        throw redirect(307, `${qloOrigin}${redirectURL}`);
+      if (!config.locales.includes(params.locale)) {
+        throw error(404, "Not found");
       }
 
-      return;
+      if (config.cookieOptions) {
+        const cookieLocale = findLocale(cookie.get(cookieName)?.value);
+        if (!cookieLocale || cookieLocale !== params.locale) {
+          cookie.set(cookieName, params.locale, config.cookieOptions);
+        }
+      }
+
+      locale(params.locale);
     }
 
-    if (!config.locales.includes(params.locale)) {
-      throw error(404, "Not found");
-    }
-
-    const qloHostname = qloOrigin ? new URL(qloOrigin).hostname : url.hostname;
-    if (url.hostname !== qloHostname) {
-      throw redirect(307, `${qloOrigin}${url.pathname}${url.search}`);
-    }
-
-    if (config.cookieOptions) {
-      const cookieLocale = findLocale(cookie.get(cookieName)?.value);
-      if (!cookieLocale || cookieLocale !== params.locale) {
-        cookie.set(cookieName, params.locale, config.cookieOptions);
+    function checkHostname() {
+      const qloHostname = qloOrigin
+        ? new URL(qloOrigin).hostname
+        : url.hostname;
+      if (url.hostname !== qloHostname) {
+        throw redirect(307, `${qloOrigin}${url.pathname}${url.search}`);
       }
     }
 
-    locale(params.locale);
-    return;
+    checkLocale();
+    checkHostname();
   };
 };
